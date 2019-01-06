@@ -1,5 +1,5 @@
 /*               ***** GAME OF THE AMAZONS 计算概论A 大作业 崔斌老师班 *****
-
+ 
  Made by Sunghyun Yoon (尹星铉 1800094617) & Joonwoo Jang (张晙优 1800094804）, Peking University*/
 
 #include <iostream>
@@ -108,7 +108,7 @@ void K_move_B(node1 pre)                //尹星铉 1800094617
     }
 }
 
-void Q_move_W(node1 pre)                //张俊优 1800094804
+void Q_move_W(node1 pre)                //尹星铉  1800094617
 {
     node1 st, next;
     queue<node1>W;
@@ -188,7 +188,7 @@ void getMove()                   //尹星铉 1800094617
 {
     node1 w;
     
-    for (int i = 0; i < GRIDSIZE; i++)                //«Ûø’∏Òµƒ∫⁄£¨∞◊queen move
+    for (int i = 0; i < GRIDSIZE; i++)
         for (int j = 0; j < GRIDSIZE; j++)
         {
             if (temp[i][j] == grid_white)
@@ -351,7 +351,7 @@ void getValue()                    //尹星铉   1800094617      求territory �
                 }
                 if (Kblack[i][j] == Kwhite[i][j] && Kblack[i][j] != 10000)
                 {
-                    t2 -= K * currBotColor;           //«Ût2
+                    t2 -= K * currBotColor;           //t2
                 }
             }
         }
@@ -417,6 +417,18 @@ bool Move(int x0, int y0, int x1, int y1, int x2, int y2, int color, bool check_
 }
 
 
+
+void playerMove(int x0, int y0, int x1, int y1, int color)            //张俊优 1800094804
+{
+    gridInfo[x0][y0] = 0;
+    gridInfo[x1][y1] = color;
+}
+
+void putArrow(int x, int y)            //张俊优 1800094804
+{
+    gridInfo[x][y] = OBSTACLE;
+}
+
 bool checkCanmove(int x, int y)             //张俊优 1800094804
 {
     int x1, y1;
@@ -433,16 +445,18 @@ bool checkCanmove(int x, int y)             //张俊优 1800094804
     return false;
 }
 
-bool checkCanMoveTo(int x0, int y0, int x1, int y1){    //张俊优 1800094804
+bool checkCanMoveTo(int x0, int y0, int x1, int y1) {    //张俊优 1800094804
     
-    if(inMap(x1,y1) && checkCanmove(x0, y0)){
+    if (inMap(x1, y1) && checkCanmove(x0, y0)) {
         int tx1, ty1;
-        for(int i = 0; i<8; i++){
-            for(int b = 1; b<=8; b++){
-                tx1 = x0 + dx[i]*b;
-                ty1 = y0 + dy[i]*b;
+        for (int i = 0; i < 8; i++) {
+            for (int b = 1; b <= 8; b++) {
+                tx1 = x0 + dx[i] * b;
+                ty1 = y0 + dy[i] * b;
                 
-                if(tx1 == x1 && ty1 == y1){
+                if (gridInfo[tx1][ty1] != 0)
+                    break;
+                if (tx1 == x1 && ty1 == y1) {
                     return true;
                 }
             }
@@ -450,12 +464,18 @@ bool checkCanMoveTo(int x0, int y0, int x1, int y1){    //张俊优 1800094804
     }
     
     return false;
-
-}
     
+}
 
-void reset()              //尹星铉    1800094617
+
+void reset()              //张俊优 1800094804
 {
+    for (int i = 0; i < GRIDSIZE; i++)
+        for (int j = 0; j < GRIDSIZE; j++)
+        {
+            gridInfo[i][j] = 0;
+        }
+    
     gridInfo[0][(GRIDSIZE - 1) / 3] = gridInfo[(GRIDSIZE - 1) / 3][0]
     = gridInfo[GRIDSIZE - 1 - ((GRIDSIZE - 1) / 3)][0]
     = gridInfo[GRIDSIZE - 1][(GRIDSIZE - 1) / 3] = grid_black;
@@ -477,11 +497,11 @@ void printBoard(int gridinfo[8][8])  // 张俊优 1800094804
         cout << "                |                |                |                |                |                |                |                |" << endl;
         cout << "                |                |                |                |                |                |                |                |" << endl;
         for (int b = 0; b < 8; b++) {
-            if (gridinfo[a][b]==0) {
+            if (gridinfo[a][b] == 0) {
                 printf("  x = %d, y = %d  |", a, b);
             }
-            else if (gridinfo[a][b]!=0) {
-                if (gridinfo[a][b]!=2) {
+            else if (gridinfo[a][b] != 0) {
+                if (gridinfo[a][b] != 2) {
                     if (gridinfo[a][b] == -1) {
                         printf("        W       |");
                     }
@@ -529,7 +549,7 @@ void Save()               //尹星铉     1800094617
     fout.close();
 }
 
-void getSave()          //张俊优 1800094804
+void getSave()           //尹星铉     1800094617
 {
     char a[100];
     cout << "Which file do you want to load?" << endl;
@@ -586,6 +606,9 @@ void playerMove()                              //张晙优 1800094804
         }
     }
     
+    playerMove(x0, y0, x1, y1, player);
+    printBoard(gridInfo);
+    
     cout << "To which position do you want to place the arrow?" << endl;
     cin >> x2 >> y2;
     
@@ -593,7 +616,7 @@ void playerMove()                              //张晙优 1800094804
     {
         while (1)
         {
-            if(x2 == x0 && y2 == y0){
+            if (x2 == x0 && y2 == y0) {
                 break;
             }
             cout << "Wrong move, Which position do you want to place the arrow?" << endl;
@@ -604,7 +627,7 @@ void playerMove()                              //张晙优 1800094804
     }
     
     
-    Move(x0, y0, x1, y1, x2, y2, player, false);
+    putArrow(x2, y2);
 }
 
 int main()
@@ -701,13 +724,13 @@ int main()
         }
     }
     
-    else if (ord == 2&&player==1)
+    else if (ord == 2 && player == 1)
     {
         playerMove();
         printBoard(gridInfo);
     }
     
-    while(1)
+    while (1)
     {
         int flag = 0;    //做标记是否重新开始
         turn++;
@@ -720,52 +743,55 @@ int main()
             for (int j0 = 0; j0 < GRIDSIZE; ++j0) {
                 for (int k1 = 0; k1 < 8; ++k1) {
                     for (int delta1 = 1; delta1 < GRIDSIZE; delta1++) {
-                        int xx = i0 + dx[k1] * delta1;
-                        int yy = j0 + dy[k1] * delta1;
-                        if (gridInfo[xx][yy] != 0 || !inMap(xx, yy))
-                            break;//不是空格或不在棋盘
-                        for (int l = 0; l < 8; ++l) {
-                            for (int delta2 = 1; delta2 < GRIDSIZE; delta2++) {
-                                int xxx = xx + dx[l] * delta2;
-                                int yyy = yy + dy[l] * delta2;         //实现queen move
-                                if (!inMap(xxx, yyy))
-                                    break;
-                                if (gridInfo[xxx][yyy] != 0 && !(i0 == xxx && j0 == yyy))//不能放在原来的位置或有棋的地方
-                                    break;
-                                if (Move(i0, j0, xx, yy, xxx, yyy, currBotColor, true))
-                                {
-                                    memcpy(temp, gridInfo, sizeof(gridInfo));
-                                    
-                                    temp[i0][j0] = 0;
-                                    temp[xx][yy] = currBotColor;
-                                    temp[xxx][yyy] = OBSTACLE;      //模拟棋盘
-                                    
-                                    
-                                    for (int i = 0; i < GRIDSIZE; i++)
-                                        for (int j = 0; j < GRIDSIZE; j++)
-                                        {
-                                            Qblack[i][j] = 1000;
-                                            Qwhite[i][j] = 1000;
-                                            Kblack[i][j] = 1000;
-                                            Kwhite[i][j] = 1000;
-                                        }
-                                    getMove();
-                                    getValue();
-                                    valueP = v(turn);
-                                    if (maxValue < valueP)
+                        if (gridInfo[i0][j0] == currBotColor)
+                        {
+                            int xx = i0 + dx[k1] * delta1;
+                            int yy = j0 + dy[k1] * delta1;
+                            if (gridInfo[xx][yy] != 0 || !inMap(xx, yy))
+                                break;//不是空格或不在棋盘
+                            for (int l = 0; l < 8; ++l) {
+                                for (int delta2 = 1; delta2 < GRIDSIZE; delta2++) {
+                                    int xxx = xx + dx[l] * delta2;
+                                    int yyy = yy + dy[l] * delta2;         //实现queen move
+                                    if (!inMap(xxx, yyy))
+                                        break;
+                                    if (gridInfo[xxx][yyy] != 0 && !(i0 == xxx && j0 == yyy))//不能放在原来的位置或有棋的地方
+                                        break;
+                                    if (Move(i0, j0, xx, yy, xxx, yyy, currBotColor, true))
                                     {
-                                        maxValue = valueP;
-                                        startX = i0;
-                                        startY = j0;
-                                        resultX = xx;
-                                        resultY = yy;
-                                        obstacleX = xxx;
-                                        obstacleY = yyy;
+                                        memcpy(temp, gridInfo, sizeof(gridInfo));
+                                        
+                                        temp[i0][j0] = 0;
+                                        temp[xx][yy] = currBotColor;
+                                        temp[xxx][yyy] = OBSTACLE;      //模拟棋盘
+                                        
+                                        
+                                        for (int i = 0; i < GRIDSIZE; i++)
+                                            for (int j = 0; j < GRIDSIZE; j++)
+                                            {
+                                                Qblack[i][j] = 1000;
+                                                Qwhite[i][j] = 1000;
+                                                Kblack[i][j] = 1000;
+                                                Kwhite[i][j] = 1000;
+                                            }
+                                        getMove();
+                                        getValue();
+                                        valueP = v(turn);
+                                        if (maxValue < valueP)
+                                        {
+                                            maxValue = valueP;
+                                            startX = i0;
+                                            startY = j0;
+                                            resultX = xx;
+                                            resultY = yy;
+                                            obstacleX = xxx;
+                                            obstacleY = yyy;
+                                        }
+                                        
                                     }
-                                    
                                 }
+                                
                             }
-                            
                         }
                     }
                     
@@ -773,7 +799,7 @@ int main()
             }
         }
         
-        Move(startX, startY, resultX, resultY, obstacleX, obstacleY,currBotColor,false);
+        Move(startX, startY, resultX, resultY, obstacleX, obstacleY, currBotColor, false);
         
         printBoard(gridInfo);
         
@@ -818,20 +844,28 @@ int main()
         cout << "If you want to continue the game please input '1'.\nIf you want to go back to the Menu, please input '2'" << endl;
         int ord1;
         cin >> ord1;
-        if(ord1 != 2 || ord1!= 1){
-            while(1){
+        if (ord1 != 2 && ord1 != 1) {
+            while (1) {
+                printBoard(gridInfo);
                 cout << "Invalid command. Please input either 1 to continue the game or 2 to go back to the menu.";
                 cin >> ord1;
-                if(ord1 == 1 || ord1 == 2){
+                if (ord1 == 1 || ord1 == 2) {
                     break;
                 }
             }
         }
-        if (ord1 == 2)
+        if (ord1 == 1)
         {
+            printBoard(gridInfo);
+        }
+        
+        else if (ord1 == 2)
+        {
+            printBoard(gridInfo);
             cout << "1. Restart " << endl;
             cout << "2. Save  " << endl;
             cout << "3. End  " << endl;
+            cout << "4. Cancel" << endl;
             
             cout << "Please input your command." << endl;
             int ord2;
@@ -842,6 +876,7 @@ int main()
                 if (ord2 == 1)
                 {
                     reset();
+                    printBoard(gridInfo);
                     cout << "Please choose your stone" << endl;
                     cout << "black: 1" << endl;
                     cout << "white: -1" << endl;
@@ -851,6 +886,7 @@ int main()
                     {
                         while (1)
                         {
+                            printBoard(gridInfo);
                             cout << "Wrong value. Please input either 1 for black or -1 for white" << endl;
                             cin >> player;
                             if (player == 1 || player == -1)
@@ -870,25 +906,34 @@ int main()
                 {
                     Save();
                     flag = 2;
+                    printBoard(gridInfo);
                     break;
                 }
                 else if (ord2 == 3)
                 {
                     flag = 3;
+                    printBoard(gridInfo);
+                    break;
+                }
+                else if (ord2 == 4)
+                {
+                    printBoard(gridInfo);
                     break;
                 }
                 else
                 {
+                    printBoard(gridInfo);
                     cout << "Invalid Command." << endl;
                     cout << "1. Restart " << endl;
                     cout << "2. Save  " << endl;
                     cout << "3. End  " << endl;
+                    cout << "4.Cancel" << endl;
                     
                     cout << "Please input your command." << endl;
                 }
             }
         }
-    
+        
         
         if (flag == 1)
             continue;
@@ -897,7 +942,7 @@ int main()
             int ord;
             cout << "Please input your command." << endl;
             cout << "1. Continue" << endl;
-            cout << "2. end" << endl;
+            cout << "2. End" << endl;
             while (1)
             {
                 cin >> ord;
@@ -905,19 +950,21 @@ int main()
                     return 0;
                 else if (ord == 1)
                 {
+                    printBoard(gridInfo);
                     break;
                 }
                 else
                 {
+                    printBoard(gridInfo);
                     cout << "Wrong command" << endl;
                     cout << "Please input your command." << endl;
                     cout << "1. Continue" << endl;
-                    cout << "2. end" << endl;
+                    cout << "2. End" << endl;
                 }
             }
             
         }
-        else if(flag==3)
+        else if (flag == 3)
             break;
         
         playerMove();
